@@ -1,3 +1,4 @@
+import time
 from enum import Enum
 from random import randint
 
@@ -9,12 +10,13 @@ class EMenu(Enum):
 
 class MainMenu(EMenu):
     START = 1
-    EXIT = 2
+    EXIT = 9
 
 
 class Menu(EMenu):
     FIGHT = 1
     UPGRADE = 2
+    EXIT = 9
 
 
 class Character:
@@ -46,22 +48,64 @@ class Character:
             self._current_health -= value
 
     def attack(self, character):
-        self.sub_current_health(character.power)
+        character.sub_current_health(self.power)
 
     def reset(self):
         self.set_current_health(self.total_health)
+
+
+class NPC(Character):
+    pass
+
+
+class Player(Character):
+    pass
 
 
 class Battle:
     def __init__(self, player: Character, opponent: Character):
         self.player = player
         self.opponent = opponent
-        self.first_move = randint(0, 1)
+        self.current_turn = randint(0, 1)
 
     def start(self):
-        while self.player.set_current_health != 0 or self.opponent.set_current_health != 0:
-            pass
+        print("Battle started!")
+
+        while True:
+            if self.player.get_current_health() == 0:
+                break
+            elif self.opponent.get_current_health() == 0:
+                break
+            self.print_allchar_info()
+
+            # player's turn
+            if self.current_turn == 0:
+                # time.sleep(1)
+                turn_active = True
+                while turn_active:
+                    print("1. Attack")
+                    selection = int(input("> "))
+                    if selection == 1:
+                        self.player.attack(self.opponent)
+                        print(f"You attack {self.opponent.name} for {self.player.power} dmg!")
+                        self.current_turn = 1
+                        turn_active = False
+            # npc turn
+            elif self.current_turn == 1:
+                # time.sleep(1)
+                print(f"{self.opponent.name}'s turn!")
+                self.opponent.attack(self.player)
+                print(f"{self.opponent.name} attacks {self.player.name} for {self.opponent.power} dmg!")
+                self.current_turn = 0
+        print("Battle finished!")
         self.reset()
+
+    def print_char_info(self, character: Character):
+        print(f"{character.name} | Health: {character.get_current_health()}")
+
+    def print_allchar_info(self):
+        self.print_char_info(self.player)
+        self.print_char_info(self.opponent)
 
     def reset(self):
         self.player.reset()
@@ -77,41 +121,52 @@ class App:
     def run(self):
         while self._run:
             print(f'DragonFight v{self.version}')
+            print(f"{MainMenu.START.value}. Start")
+            print(f"{MainMenu.EXIT.value}. Exit")
             self.init()
+            self.inpt()
 
-            if self.main_menu():
+            if self.selection == MainMenu.START.value:
                 self.start()
-            else:
+            elif self.selection == MainMenu.EXIT.value:
                 print("exiting")
                 exit()
-
-    def main_menu(self):
-        self.inpt()
-
-        if self.selection is MainMenu.START.value:
-            return True
-        elif self.selection is MainMenu.EXIT.value:
-            return False
-        else:
-            print("Not a valid selection.")
-            self.main_menu()
+            else:
+                print("Not a valid selection.")
 
     def start(self):
+        print(f"{Menu.FIGHT.value}. Fight")
+        print(f"{Menu.EXIT.value}. Exit")
         self.inpt()
 
-        if self.selection is Menu.FIGHT.value:
-            pass
+        if self.selection == Menu.FIGHT.value:
+            print("in here")
+            Battle(self.player, self.npc).start()
+
+        elif self.selection == Menu.EXIT.value:
+            exit()
 
         else:
             print("Not a valid selection.")
             self.start()
 
+    def main_menu(self):
+        self.inpt()
+
+        if self.selection == MainMenu.START.value:
+            return True
+        elif self.selection == MainMenu.EXIT.value:
+            return False
+        else:
+            print("Not a valid selection.")
+            self.main_menu()
+
     def inpt(self):
         self.selection = int(input("> "))
 
     def init(self):
-        sindragosa = Character("Sindragosa", 100, 9)
-        alexstrasza = Character("Alexstrasza", 100, 11)
+        self.player = Character("Alexstrasza", 100, 11)
+        self.npc = Character("Sindragosa", 100, 9)
 
 
 if __name__ == '__main__':
