@@ -28,32 +28,33 @@ class Battle:
         while True:
             if self.player.get_current_health() == 0:
                 print("You died.")
-                print("Battle finished!")
-                self.reset()
-                div()
                 break
             elif self.opponent.get_current_health() == 0:
                 print(f"You have defeated {self.opponent.name}!")
-                print("Battle finished!")
-                self.reset()
-                div()
                 break
             self.print_allchar_info()
 
             if self.current_turn == Turn.PLAYER:
-                turn_active = True
-                while turn_active:
-                    subdiv()
-                    print("Your turn!")
-                    print_menu(BattleMenu)
+                subdiv()
+                print("Your turn!")
+                print_menu(BattleMenu)
+                
+                player_turn = True
+                while player_turn:
                     selection = int(input("> "))
-
+                    # gotta be another way to do this
+                    # iterate enum, check if contains? 
                     if selection == BattleMenu.ATTACK.value:
-                        self.player.attack(self.opponent)
-                        print(f"You attack {self.opponent.name} for {self.player.power} damage!")
-                        self.switch_turn()
-                        turn_active = False
-                        subdiv()
+                        selection = BattleMenu.ATTACK
+                    elif selection == BattleMenu.USE_POTION.value:
+                        selection = BattleMenu.USE_POTION
+                    else:
+                        print("Not a valid selection.")
+                        continue
+                    self.player.process_turn(selection, self.opponent)
+                    self.switch_turn()
+                    player_turn = False
+                    subdiv()
 
             elif self.current_turn == Turn.NPC:
                 subdiv()
@@ -62,6 +63,11 @@ class Battle:
                 print(f"{self.opponent.name} attacks {self.player.name} for {self.opponent.power} damage!")
                 self.switch_turn()
                 subdiv()
+        # make sure it works
+        # if not put in health checks
+        print("Battle finished!")
+        self.reset()
+        div()
 
     def switch_turn(self):
         self.current_turn = Turn.PLAYER if self.current_turn == Turn.NPC else Turn.NPC
