@@ -1,3 +1,6 @@
+from battle import BattleMenu
+
+
 class Character:
     def __init__(self, name, health, power):
         self.name = name
@@ -7,7 +10,7 @@ class Character:
         # gain experience every battle, level up? 
         self.level = 1
         self.experience = 0
-        
+
         self._isdead = False
 
     @property
@@ -23,7 +26,7 @@ class Character:
 
     def set_current_health(self, value: int):
         self._current_health = value
-    
+
     def add_current_health(self, value: int):
         if self._current_health + value > self.total_health:
             self.set_current_health(self.total_health)
@@ -46,7 +49,7 @@ class Character:
     def reset(self):
         self.set_current_health(self.total_health)
         self._isdead = False
-    
+
     def isdead(self):
         return self._isdead
 
@@ -59,9 +62,11 @@ class NPC(Character):
 
 class Player(Character):
     def process_turn(self, selection: BattleMenu, opponent: Character):
-        if selection == BattleMenu.ATTACK:
+        if selection is BattleMenu.ATTACK:
             self.attack(opponent)
-            print(f"You attack {opponent.name} for {self.player.power} damage!")
-        elif selection == BattleMenu.USE_POTION:
-            # equipment, potion classes? 
-            self.add_current_health(15)
+            print(f"You attack {opponent.name} for {self.power} damage!")
+        elif selection is BattleMenu.USE_POTION:
+            # equipment, potion classes?
+            potion_strength = 15
+            print(f"You've used a potion and gained {potion_strength} health points.")
+            self.add_current_health(potion_strength)
