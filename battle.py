@@ -26,10 +26,10 @@ class Battle:
         print("Battle started!")
 
         while True:
-            if self.player.get_current_health() == 0:
+            if self.player.isdead():
                 print("You died.")
                 break
-            elif self.opponent.get_current_health() == 0:
+            elif self.opponent.isdead():
                 print(f"You have defeated {self.opponent.name}!")
                 break
             self.print_allchar_info()

@@ -7,6 +7,8 @@ class Character:
         # gain experience every battle, level up? 
         self.level = 1
         self.experience = 0
+        
+        self._isdead = False
 
     @property
     def power(self):
@@ -31,6 +33,7 @@ class Character:
     def sub_current_health(self, value: int):
         if self._current_health - value < 0:
             self._current_health = 0
+            self._isdead = True
         else:
             self._current_health -= value
 
@@ -42,6 +45,10 @@ class Character:
 
     def reset(self):
         self.set_current_health(self.total_health)
+        self._isdead = False
+    
+    def isdead(self):
+        return self._isdead
 
 
 class NPC(Character):
