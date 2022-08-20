@@ -36,7 +36,7 @@ class Character:
     def sub_current_health(self, value: int):
         if self._current_health - value < 0:
             self._current_health = 0
-            self._isdead = True
+            self.set_dead()
         else:
             self._current_health -= value
 
@@ -48,6 +48,12 @@ class Character:
 
     def reset(self):
         self.set_current_health(self.total_health)
+        self._isdead = False
+
+    def set_dead(self):
+        self._isdead = True
+
+    def set_alive(self):
         self._isdead = False
 
     def isdead(self):

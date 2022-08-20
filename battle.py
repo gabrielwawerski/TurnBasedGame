@@ -9,16 +9,31 @@ class BattleMenu(Enum):
     USE_POTION = 2
 
 
+class MoveType(Enum):
+    NEUTRAL = 1
+    OFFENSIVE = 2
+
+
 class Turn(Enum):
     PLAYER = 0
     NPC = 1
+
+    @staticmethod
+    def random():
+        return Turn.PLAYER if randint(0, 1) == 0 else Turn.NPC
 
 
 class Battle:
     def __init__(self, player, opponent):
         self.player = player
         self.opponent = opponent
-        self.current_turn = Turn.PLAYER if randint(0, 1) == 0 else Turn.NPC
+        self.current_turn = Turn.random()
+
+    def move_type(self, action):
+        if action == BattleMenu.ATTACK:
+            return MoveType.OFFENSIVE
+        else:
+            return MoveType.NEUTRAL
 
     def start(self):
         div()
@@ -31,6 +46,7 @@ class Battle:
             elif self.opponent.isdead():
                 print(f"You have defeated {self.opponent.name}!")
                 break
+
             self.print_allchar_info()
 
             if self.current_turn == Turn.PLAYER:
@@ -42,11 +58,26 @@ class Battle:
                 player_active = True
                 while player_active:
                     selection = int(input("> "))
+
                     if selection in battle_menu_vals:
-                        self.player.process_turn(BattleMenu(selection), self.opponent)
-                        self.switch_turn()
-                        player_active = False
-                        subdiv()
+                        selection = BattleMenu(selection)
+                        # check if selection is a type of attack - if not, you get another move
+                        # for example, using potion
+                        # todo only 2 non attack actions are permitted, if more, end turn
+                        if self.move_type(selection) is MoveType.NEUTRAL:
+                            print("is neutral")
+                            self.player.process_turn(selection, self.opponent)
+                            self.print_allchar_info()
+                            print_menu(BattleMenu)
+                            subdiv()
+                        else:
+                            print("is attack!")
+                            self.player.process_turn(selection, self.opponent)
+                            print_menu(BattleMenu)
+                            subdiv()
+                            self.switch_turn()
+                            player_active = False
+
                     else:
                         print("Not a valid selection.")
                         subdiv()
