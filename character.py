@@ -20,6 +20,7 @@ class Character:
     @power.setter
     def power(self, value):
         self._power = value
+        print("lol")
 
     def get_current_health(self):
         return self._current_health
